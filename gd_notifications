@@ -1,0 +1,98 @@
+import os
+import json
+import urllib.request
+import boto3
+from datetime import datetime, timedelta, timezone
+
+def fetch_premier_league_standings(api_key):
+    """
+    Fetches Premier League standings from the Football Data API.
+    """
+    api_url = "https://api.football-data.org/v4/competitions/PL/standings"
+    headers = {"X-Auth-Token": api_key}
+
+    try:
+        request = urllib.request.Request(api_url, headers=headers)
+        with urllib.request.urlopen(request) as response:
+            data = json.loads(response.read().decode())
+            return data
+    except Exception as e:
+        print(f"Error fetching data from API: {e}")
+        raise
+
+def format_standings(data):
+    """
+    Formats the standings data into a human-readable message.
+    """
+    standings = data.get("standings", [])
+    if not standings:
+        return "No standings data available."
+
+    # Extract the first table (e.g., overall standings)
+    table = standings[0].get("table", [])
+    formatted_data = ["Premier League Standings:"]
+    
+    for position in table:
+        team_name = position.get("team", {}).get("name", "Unknown Team")
+        points = position.get("points", "N/A")
+        played = position.get("playedGames", "N/A")
+        position_text = f"{position.get('position', 'N/A')}. {team_name} - {points} points ({played} played)"
+        formatted_data.append(position_text)
+
+    return "\n".join(formatted_data)
+
+def send_sns_notification(sns_client, sns_topic_arn, message):
+    """
+    Publishes a message to an SNS topic.
+    """
+    try:
+        sns_client.publish(
+            TopicArn=sns_topic_arn,
+            Message=message,
+            Subject="Premier League Standings Update"
+        )
+        print("Message published to SNS successfully.")
+    except Exception as e:
+        print(f"Error publishing to SNS: {e}")
+        raise
+
+def lambda_handler(event, context):
+    """
+    AWS Lambda function entry point.
+    """
+    # Environment variables
+    api_key = os.getenv("PREMIER_LEAGUE_API_KEY")
+    sns_topic_arn = os.getenv("SNS_TOPIC_ARN")
+
+    if not api_key or not sns_topic_arn:
+        return {
+            "statusCode": 400,
+            "body": "Missing required environment variables (PREMIER_LEAGUE_API_KEY, SNS_TOPIC_ARN)."
+        }
+
+    # Fetch Premier League standings
+    try:
+        standings_data = fetch_premier_league_standings(api_key)
+    except Exception:
+        return {
+            "statusCode": 500,
+            "body": "Failed to fetch standings from the Football Data API."
+        }
+
+    # Format standings into a message
+    message = format_standings(standings_data)
+
+    # Send notification via SNS
+    sns_client = boto3.client("sns")
+    try:
+        send_sns_notification(sns_client, sns_topic_arn, message)
+    except Exception:
+        return {
+            "statusCode": 500,
+            "body": "Failed to send notification via SNS."
+        }
+
+    return {
+        "statusCode": 200,
+        "body": "Premier League standings fetched and sent successfully."
+    }
