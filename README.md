@@ -1,7 +1,7 @@
 # Premier_league_Notification / Sports Alerts System
 
 ## **Project Overview**
-This project is an alert system that sends real-time Premier league game score notifications to subscribed users via SMS/Email. It leverages **Amazon SNS**, **AWS Lambda and Python**, **Amazon EvenBridge** and **Premier League APIs** to provide sports fans with up-to-date game information. The project demonstrates cloud computing principles and efficient notification mechanisms.
+This project is a cloud-based Premier League Notification System designed to send real-time match updates to users via SMS or email. Built using Amazon Web Services (AWS) and Python, the system fetches live game data from an external sports API and delivers notifications through Amazon SNS. The workflow is fully automated using Amazon EventBridge and executes via an AWS Lambda function. The project demonstrates modern cloud architecture, serverless design, secure IAM policies, and API integration.
 
 ---
 
@@ -12,7 +12,7 @@ This project is an alert system that sends real-time Premier league game score n
 - Designed with security in mind, following the principle of least privilege for IAM roles.
 
 ## **Prerequisites**
-- Free account with subscription and API Key at [sportsdata.io](https://sportsdata.io/)
+- Free account with subscription and API Key at (football-data.org)
 - Personal AWS account with basic understanding of AWS and Python
 
 ---
@@ -27,7 +27,7 @@ This project is an alert system that sends real-time Premier league game score n
 ## **Technologies**
 - **Cloud Provider**: AWS
 - **Core Services**: SNS, Lambda, EventBridge
-- **External API**: NBA Game API (SportsData.io)
+- **External API**: Premier leaugue API (football-data.org)
 - **Programming Language**: Python 3.x
 - **IAM Security**:
   - Least privilege policies for Lambda, SNS, and EventBridge.
