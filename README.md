@@ -113,7 +113,7 @@ cd game-day-notifications
 - Copy the content of the src/gd_notifications.py file from the repository.
 - Paste it into the inline code editor.
 8. Under the Environment Variables section, add the following:
-- NBA_API_KEY: your NBA API key.
+- PREMIER_LEAGUE_API_KEY: your Premier leaugue API key.
 - SNS_TOPIC_ARN: the ARN of the SNS topic created earlier.
 9. Click Create Function.
 
